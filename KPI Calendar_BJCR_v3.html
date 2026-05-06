@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KPI Company Calendar</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#1A2B4A;}
+.wrap{width:100%;padding:10px;}
+.hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:#1A2B4A;padding:10px 16px;border-radius:8px;margin-bottom:10px;}
+.hdr-left .title{font-size:15px;font-weight:700;color:#fff;}
+.hdr-left .sub{font-size:11px;color:#A0B0CC;margin-top:1px;}
+.nav{display:flex;align-items:center;gap:6px;}
+.nav button{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:6px;padding:4px 14px;cursor:pointer;font-size:18px;color:#fff;line-height:1;font-weight:400;}
+.nav button:hover{background:rgba(255,255,255,0.3);}
+.mlabel{font-size:14px;font-weight:700;color:#fff;min-width:150px;text-align:center;}
+.addbtn{background:#E85C0D;color:#fff;border:none;font-size:12px;padding:7px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;font-weight:600;}
+.addbtn:hover{background:#c94e0a;}
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:8px 12px;background:#F5F6FA;border-radius:6px;margin-bottom:10px;}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:#6B7A99;}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.grid{border:1px solid #E8EBF4;border-radius:8px;overflow:hidden;width:100%;}
+.dnames{display:grid;grid-template-columns:repeat(7,1fr);background:#1A2B4A;}
+.dn{text-align:center;padding:8px 2px;font-size:11px;font-weight:700;color:#fff;letter-spacing:0.3px;}
+.gbody{display:grid;grid-template-columns:repeat(7,1fr);}
+.cell{min-height:85px;border-right:1px solid #E8EBF4;border-bottom:1px solid #E8EBF4;padding:4px;background:#fff;vertical-align:top;}
+.cell:nth-child(7n){border-right:none;}
+.cell.other{background:#F9F9FB;}
+.cell.other .dnum{color:#CDD3DF;}
+.cell.tod{background:#EEF3FB;}
+.dnum{font-size:11px;font-weight:500;color:#6B7A99;margin-bottom:3px;display:block;}
+.tcircle{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#1A2B4A;color:#fff;font-size:11px;font-weight:700;}
+.pill{font-size:9px;padding:2px 5px;border-radius:3px;margin-bottom:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:700;line-height:1.4;}
+.pill:hover{opacity:0.82;}
+.more{font-size:9px;color:#6B7A99;margin-top:1px;}
+.abtn{font-size:9px;color:#C0C8DC;cursor:pointer;margin-top:2px;display:none;}
+.cell:hover .abtn{display:block;}
+.mbg{position:fixed;inset:0;background:rgba(26,43,74,0.45);display:flex;align-items:center;justify-content:center;z-index:99999;}
+.mbox{background:#fff;border-radius:12px;padding:22px;width:330px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.mbox h3{font-size:15px;font-weight:700;color:#1A2B4A;margin-bottom:14px;}
+.mbox label{font-size:10px;color:#6B7A99;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;display:block;margin-top:10px;margin-bottom:3px;}
+.mbox input,.mbox select{width:100%;font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #D0D5E8;background:#fff;color:#1A2B4A;outline:none;}
+.mbox input:focus,.mbox select:focus{border-color:#1A2B4A;}
+.mact{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
+.mact button{font-size:13px;padding:6px 14px;border-radius:6px;cursor:pointer;border:1px solid #D0D5E8;background:#fff;color:#1A2B4A;}
+.sv{background:#1A2B4A!important;color:#fff!important;border-color:#1A2B4A!important;}
+.dbox{background:#fff;border-radius:12px;padding:18px;width:270px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.dbox h3{font-size:14px;font-weight:700;color:#1A2B4A;margin-bottom:8px;}
+.dbadge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:700;display:inline-block;margin-bottom:10px;}
+.drow{font-size:12px;color:#6B7A99;margin-bottom:5px;}
+.dact{display:flex;gap:6px;margin-top:12px;}
+.dact button{font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid #D0D5E8;background:transparent;color:#1A2B4A;}
+.del{color:#A32D2D!important;border-color:#F7C1C1!important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="title">KPI Company Calendar</div>
+      <div class="sub">Kubota Philippines Inc.</div>
+    </div>
+    <div class="nav">
+      <button id="prev-btn">&lsaquo;</button>
+      <span class="mlabel" id="mlabel">Loading...</span>
+      <button id="next-btn">&rsaquo;</button>
+    </div>
+    <button class="addbtn" id="add-btn">+ Add Event</button>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="dot" style="background:#0F6E56"></div>Regular Holiday</div>
+    <div class="li"><div class="dot" style="background:#185FA5"></div>Special Non-Working Holiday</div>
+    <div class="li"><div class="dot" style="background:#E85C0D"></div>Company Holiday</div>
+    <div class="li"><div class="dot" style="background:#854F0B"></div>Company Wide Event</div>
+    <div class="li"><div class="dot" style="background:#534AB7"></div>Departmental Event</div>
+  </div>
+  <div class="grid">
+    <div class="dnames">
+      <div class="dn">SUN</div><div class="dn">MON</div><div class="dn">TUE</div>
+      <div class="dn">WED</div><div class="dn">THU</div><div class="dn">FRI</div><div class="dn">SAT</div>
+    </div>
+    <div class="gbody" id="gbody"></div>
+  </div>
+</div>
+
+<div id="m-add" style="display:none" class="mbg">
+  <div class="mbox">
+    <h3>Add Event</h3>
+    <label>Event Title</label><input type="text" id="e-title" placeholder="e.g. Independence Day"/>
+    <label>Start Date</label><input type="date" id="e-start"/>
+    <label>End Date</label><input type="date" id="e-end"/>
+    <label>Event Type</label>
+    <select id="e-type">
+      <option>Regular Holiday</option>
+      <option>Special Non-Working Holiday</option>
+      <option>Company Holiday</option>
+      <option>Company Wide Event</option>
+      <option>Departmental Event</option>
+    </select>
+    <label>Department (for Departmental Events)</label>
+    <input type="text" id="e-dept" placeholder="e.g. HR, Finance, IT"/>
+    <div class="mact">
+      <button onclick="document.getElementById('m-add').style.display='none'">Cancel</button>
+      <button class="sv" onclick="saveEv()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="m-det" style="display:none" class="mbg">
+  <div class="dbox">
+    <h3 id="d-title"></h3>
+    <span class="dbadge" id="d-badge"></span>
+    <div class="drow" id="d-date"></div>
+    <div class="drow" id="d-dept" style="display:none"></div>
+    <div class="dact">
+      <button onclick="document.getElementById('m-det').style.display='none'">Close</button>
+      <button class="del" onclick="delEv()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var COLORS={
+  "Regular Holiday":{bg:"#0F6E56",tx:"#fff"},
+  "Special Non-Working Holiday":{bg:"#185FA5",tx:"#fff"},
+  "Company Holiday":{bg:"#E85C0D",tx:"#fff"},
+  "Company Wide Event":{bg:"#854F0B",tx:"#fff"},
+  "Departmental Event":{bg:"#534AB7",tx:"#fff"}
+};
+var MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+var now=new Date();
+var vy=now.getFullYear(), vm=now.getMonth(), did=null, nid=200;
+
+var EV=[
+  {id:1, t:"New Year's Day",d:"2026-01-01",e:"2026-01-01",c:"Regular Holiday",dp:""},
+  {id:2, t:"Araw ng Kagitingan",d:"2026-04-09",e:"2026-04-09",c:"Regular Holiday",dp:""},
+  {id:3, t:"Labor Day",d:"2026-05-01",e:"2026-05-01",c:"Regular Holiday",dp:""},
+  {id:4, t:"Independence Day",d:"2026-06-12",e:"2026-06-12",c:"Regular Holiday",dp:""},
+  {id:5, t:"National Heroes Day",d:"2026-08-31",e:"2026-08-31",c:"Regular Holiday",dp:""},
+  {id:6, t:"Bonifacio Day",d:"2026-11-30",e:"2026-11-30",c:"Regular Holiday",dp:""},
+  {id:7, t:"Christmas Day",d:"2026-12-25",e:"2026-12-25",c:"Regular Holiday",dp:""},
+  {id:8, t:"Rizal Day",d:"2026-12-30",e:"2026-12-30",c:"Regular Holiday",dp:""},
+  {id:9, t:"EDSA Revolution",d:"2026-02-25",e:"2026-02-25",c:"Special Non-Working Holiday",dp:""},
+  {id:10,t:"All Saints Day",d:"2026-11-01",e:"2026-11-01",c:"Special Non-Working Holiday",dp:""},
+  {id:11,t:"Ninoy Aquino Day",d:"2026-08-21",e:"2026-08-21",c:"Special Non-Working Holiday",dp:""},
+  {id:12,t:"Company Foundation Day",d:"2026-06-15",e:"2026-06-15",c:"Company Holiday",dp:""},
+  {id:13,t:"Christmas Break",d:"2026-12-26",e:"2026-12-31",c:"Company Holiday",dp:""},
+  {id:14,t:"Q2 Town Hall",d:"2026-06-20",e:"2026-06-20",c:"Company Wide Event",dp:""},
+  {id:15,t:"Annual Company Outing",d:"2026-07-18",e:"2026-07-19",c:"Company Wide Event",dp:""},
+  {id:16,t:"Year-End Party",d:"2026-12-18",e:"2026-12-18",c:"Company Wide Event",dp:""},
+  {id:17,t:"HR Seminar",d:"2026-05-14",e:"2026-05-14",c:"Departmental Event",dp:"HR"},
+  {id:18,t:"Finance Review",d:"2026-05-28",e:"2026-05-28",c:"Departmental Event",dp:"Finance"},
+  {id:19,t:"IT Security Training",d:"2026-06-05",e:"2026-06-05",c:"Departmental Event",dp:"IT"}
+];
+
+function p2(n){return ("0"+n).slice(-2);}
+function fd(y,m,d){return y+"-"+p2(m+1)+"-"+p2(d);}
+function fdisp(s){var a=s.split("-");return MN[parseInt(a[1])-1]+" "+parseInt(a[2])+", "+a[0];}
+
+function render(){
+  var lbl=document.getElementById("mlabel");
+  if(lbl) lbl.textContent=MN[vm]+" "+vy;
+
+  var f=new Date(vy,vm,1);
+  var l=new Date(vy,vm+1,0);
+  var sd=f.getDay();
+  var tot=Math.ceil((sd+l.getDate())/7)*7;
+  var ts=fd(now.getFullYear(),now.getMonth(),now.getDate());
+  var body=document.getElementById("gbody");
+  if(!body) return;
+  body.innerHTML="";
+
+  for(var i=0;i<tot;i++){
+    var dn=i-sd+1;
+    var cell=document.createElement("div");
+    cell.className="cell";
+    var cd, other=false, disp="";
+
+    if(dn<1){
+      var xd=new Date(vy,vm,dn);
+      cd=fd(xd.getFullYear(),xd.getMonth(),xd.getDate());
+      other=true;
+    } else if(dn>l.getDate()){
+      var xd2=new Date(vy,vm+1,dn-l.getDate());
+      cd=fd(xd2.getFullYear(),xd2.getMonth(),xd2.getDate());
+      other=true;
+    } else {
+      cd=fd(vy,vm,dn);
+      disp=dn;
+    }
+
+    if(other) cell.classList.add("other");
+    if(cd===ts) cell.classList.add("tod");
+
+    var dn_el=document.createElement("span");
+    dn_el.className="dnum";
+    if(cd===ts&&!other){
+      dn_el.innerHTML='<span class="tcircle">'+disp+'</span>';
+    } else {
+      dn_el.textContent=disp;
+    }
+    cell.appendChild(dn_el);
+
+    if(!other){
+      var de=EV.filter(function(ev){
+        var s=ev.d, en=ev.e||ev.d;
+        return cd>=s&&cd<=en;
+      });
+      de.slice(0,3).forEach(function(ev){
+        var pill=document.createElement("span");
+        pill.className="pill";
+        var col=COLORS[ev.c]||{bg:"#888",tx:"#fff"};
+        pill.style.background=col.bg;
+        pill.style.color=col.tx;
+        pill.textContent=ev.t+(ev.dp?" ("+ev.dp+")":"");
+        pill.title=ev.t;
+        (function(id){
+          pill.addEventListener("click",function(e){e.stopPropagation();showDet(id);});
+        })(ev.id);
+        cell.appendChild(pill);
+      });
+      if(de.length>3){
+        var m=document.createElement("div");
+        m.className="more";
+        m.textContent="+"+(de.length-3)+" more";
+        cell.appendChild(m);
+      }
+      var ab=document.createElement("div");
+      ab.className="abtn";
+      ab.textContent="+ add";
+      (function(c2){ab.addEventListener("click",function(){openAdd(c2);});})(cd);
+      cell.appendChild(ab);
+    }
+    body.appendChild(cell);
+  }
+}
+
+function openAdd(date){
+  document.getElementById("e-title").value="";
+  document.getElementById("e-start").value=date||"";
+  document.getElementById("e-end").value=date||"";
+  document.getElementById("e-type").value="Regular Holiday";
+  document.getElementById("e-dept").value="";
+  document.getElementById("m-add").style.display="flex";
+}
+
+function saveEv(){
+  var t=document.getElementById("e-title").value.trim();
+  var d=document.getElementById("e-start").value;
+  var en=document.getElementById("e-end").value||d;
+  var c=document.getElementById("e-type").value;
+  var dp=document.getElementById("e-dept").value.trim();
+  if(!t){alert("Please enter a title.");return;}
+  if(!d){alert("Please select a date.");return;}
+  EV.push({id:nid++,t:t,d:d,e:en,c:c,dp:dp});
+  document.getElementById("m-add").style.display="none";
+  render();
+}
+
+function showDet(id){
+  var ev=null;
+  for(var i=0;i<EV.length;i++){if(EV[i].id===id){ev=EV[i];break;}}
+  if(!ev)return;
+  did=id;
+  document.getElementById("d-title").textContent=ev.t;
+  var b=document.getElementById("d-badge");
+  var col=COLORS[ev.c]||{bg:"#888",tx:"#fff"};
+  b.style.background=col.bg;b.style.color=col.tx;b.textContent=ev.c;
+  document.getElementById("d-date").textContent=ev.d===ev.e?fdisp(ev.d):fdisp(ev.d)+" - "+fdisp(ev.e);
+  var dr=document.getElementById("d-dept");
+  if(ev.dp){dr.textContent="Department: "+ev.dp;dr.style.display="block";}
+  else{dr.style.display="none";}
+  document.getElementById("m-det").style.display="flex";
+}
+
+function delEv(){
+  if(!confirm("Delete this event?"))return;
+  EV=EV.filter(function(ev){return ev.id!==did;});
+  document.getElementById("m-det").style.display="none";
+  render();
+}
+
+window.saveEv=saveEv;
+window.delEv=delEv;
+window.openAdd=openAdd;
+
+document.getElementById("prev-btn").addEventListener("click",function(){
+  vm--;if(vm<0){vm=11;vy--;}render();
+});
+document.getElementById("next-btn").addEventListener("click",function(){
+  vm++;if(vm>11){vm=0;vy++;}render();
+});
+document.getElementById("add-btn").addEventListener("click",function(){openAdd(null);});
+document.getElementById("m-add").addEventListener("click",function(e){if(e.target===this)this.style.display="none";});
+document.getElementById("m-det").addEventListener("click",function(e){if(e.target===this)this.style.display="none";});
+
+render();
+})();
+</script>
+</body>
+</html>
